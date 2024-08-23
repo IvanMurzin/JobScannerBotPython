@@ -10,10 +10,8 @@ api_id = int(os.getenv('API_ID'))
 api_hash = os.getenv('API_HASH')
 phone_number = os.getenv('PHONE_NUMBER')
 folder_name = os.getenv('FOLDER_NAME')
-peer_user_id = int(os.getenv('PEER_USER_ID'))
 peer_channel_id = int(os.getenv('PEER_CHANNEL_ID'))
 
-peer_user = PeerUser(peer_user_id)
 peer_channel = PeerChannel(peer_channel_id)
 
 client = TelegramClient('my_session', api_id, api_hash)
