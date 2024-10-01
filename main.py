@@ -1,4 +1,5 @@
 import os
+import traceback
 
 from telethon import TelegramClient, events, functions
 from telethon.tl.types import PeerChannel, PeerUser
@@ -48,20 +49,30 @@ async def handler(event):
                     unread=True
                 ))
     except Exception as e:
-        print(f"Handle error: {e}")
+        error_message = f"Handle error: {e}\n{traceback.format_exc()}"
+        print(error_message)
+        await client.send_message(peer_channel, f"Бот упал с ошибкой:\n{error_message}")
 
 
 async def main():
-    await client.start(phone_number)
-    global tracked_chat_ids
-    tracked_chat_ids = await get_chats_from_folder(folder_name)
-    for chat_id in tracked_chat_ids:
-        try:
-            chat_entity = await client.get_entity(PeerChannel(chat_id))
-            print(f"Name: {chat_entity.title}")
-        except Exception as e:
-            print(f"Failed to get chat name for ID {chat_id}: {e}")
-    await client.run_until_disconnected()
+    try: 
+        await client.start(phone_number)
+        global tracked_chat_ids
+        tracked_chat_ids = await get_chats_from_folder(folder_name)
+        for chat_id in tracked_chat_ids:
+            try:
+                chat_entity = await client.get_entity(PeerChannel(chat_id))
+                print(f"Name: {chat_entity.title}")
+            except Exception as e:
+                error_message = f"Failed to get chat name for ID {chat_id}: {e}"
+                print(error_message)
+                await client.send_message(peer_channel, f"Ошибка при получении чата с ID {chat_id}:\n{error_message}")
+                
+        await client.run_until_disconnected()
+    except Exception as e:
+        error_message = f"Main function error: {e}\n{traceback.format_exc()}"
+        print(error_message)
+        await client.send_message(peer_channel, f"Бот упал с ошибкой в основной функции:\n{error_message}")
 
 
 client.loop.run_until_complete(main())
