@@ -36,13 +36,16 @@ async def get_chats_from_folder(folder):
 @client.on(events.NewMessage())
 async def handler(event):
     try:
+        if event.message is None:
+            return
+        
         event_id = event.message.chat.id
         if event_id == peer_channel.channel_id:
             return
         if event_id in tracked_chat_ids:
             message_text = event.message.text
             keywords = ['mobile', 'android', 'flutter']
-            if any(keyword in message_text.lower() for keyword in keywords):
+            if message_text and any(keyword in message_text.lower() for keyword in keywords):
                 await client.forward_messages(peer_channel, event.message)
                 await client(functions.messages.MarkDialogUnreadRequest(
                     peer=peer_channel,
