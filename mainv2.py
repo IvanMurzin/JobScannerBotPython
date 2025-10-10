@@ -62,6 +62,9 @@ async def get_chat_ids_from_folder(folder_name: str) -> list[int]:
     chat_ids = []
     resp = await client(functions.messages.GetDialogFiltersRequest())
     for f in resp.filters or []:
+        # у DialogFilterDefault нет title
+        if not hasattr(f, "title"):
+            continue
         if f.title.lower() == folder_name.lower():
             peers = (f.include_peers or []) + (f.pinned_peers or [])
             for p in peers:
@@ -71,6 +74,7 @@ async def get_chat_ids_from_folder(folder_name: str) -> list[int]:
                     chat_ids.append(int(cid))
             break
     return chat_ids
+
 
 
 # ==============================
